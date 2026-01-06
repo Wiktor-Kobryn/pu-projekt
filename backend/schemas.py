@@ -22,12 +22,15 @@ class WpisResponse(BaseModel):
 
 class WpisRequest(BaseModel):
     tekst_id: int
-    rola: str
+    rola: str # user / assistant
     tresc: str
 
-class AiCommunicationRequest:
+class AiStatelessRequest(BaseModel):
     polecenie: str # streść / wytłumacz prościej / przetłumacz na język XYZ
     tekst: str
 
-class AiCommunicationResponce:
+class AiTextRequest(BaseModel):
+    zapytanie: str # pełne zapytanie
+
+class AiTextResponse(BaseModel):
     tekst: str

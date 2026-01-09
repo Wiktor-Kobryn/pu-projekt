@@ -64,6 +64,19 @@ def add_wpis(data: WpisRequest, db: Session = Depends(get_db)):
     db.commit()
     return nowy_wpis
 
+# WPISY - DELETE ALL BY TEKST ID
+@app.delete("/tekst/{tekstId}/wpisy")
+def delete_all_wpisy_by_tekst(tekstId: int, db: Session = Depends(get_db)):
+    tekst = db.query(Tekst).filter(Tekst.id == tekstId).first()
+    if not tekst:
+        raise HTTPException(404, "Nie znaleziono tekstu")
+
+    db.query(Wpis).filter(Wpis.tekst_id == tekstId).delete(synchronize_session=False)
+    db.commit()
+
+    return { "message": "Poprawnie usunięto wpisy" }
+
+
 # AI REQUEST - STATELESS
 @app.post("/ai-stateless", response_model=AiTextResponse)
 def ask_ai_stateless(data: AiStatelessRequest):

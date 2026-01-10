@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from sqlalchemy.orm import Session
 from model import *
-from schemas import TekstRequest, TekstResponse, WpisRequest, WpisResponse, AiStatelessRequest, AiTextResponse, AiTextRequest
+from schemas import TekstRequest, TekstResponse, WpisRequest, WpisResponse, AiStatelessRequest, AiTextResponse, AiTextRequest, AiQuizRequest, AiQuizResponse
 from database import SessionLocal, engine, Base
 from gemini_chat import *
 
@@ -102,6 +102,17 @@ def ask_ai_stateful(tekstId: int, data: AiTextRequest, db: Session = Depends(get
     db.commit()
 
     return AiTextResponse(tekst=odpowiedz)
+
+# AI REQUEST - STATEFUL
+@app.post("/ai-quiz/{tekstId}", response_model=AiQuizResponse)
+def ask_ai_create_quiz(tekstId: int, data: AiQuizRequest, db: Session = Depends(get_db)):
+    tekst = db.query(Tekst).filter(Tekst.id == tekstId).first()
+    if not tekst:
+        raise HTTPException(404, "Nie znaleziono tekstu")
+
+    quiz = ask_gemini_generate_quiz(data.ilosc_pytan, tekst)
+    return quiz
+
 
 app.add_middleware(
     CORSMiddleware,
